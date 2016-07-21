@@ -1,0 +1,31 @@
+# Node.js 기반 애플리케이션 Dockerfile 예제 (52p)
+
+FROM node:0.10
+
+MAINTAINER Anna Doe <anna@example.com>
+
+LABEL "rating"="Five Stars" "class"="First Class"
+
+USER root
+
+# 환경변수 설정
+ENV AP /data/app
+ENV SCPATH /etc/supervisor/conf.d
+
+RUN apt-get -y update
+
+# 필요 데몬들 설치
+RUN apt-get -y install supervisor
+RUN mkdir -p /var/log/supervisor
+
+# Supervisor 설정 파일 카피
+ADD ./supervisord/conf.d/* $SCPATH/
+
+# 애플리케이션 코드 파일 카피
+ADD *.js* $AP/
+
+WORKDIR $AP
+
+RUN npm install
+
+CMD ["supervisord", "-n"]
